@@ -63,15 +63,23 @@ const collabKey = new PluginKey("collab")
 // Creates a plugin that enables the collaborative editing framework
 // for the editor.
 //
+// @cn 创建一个能使编辑器支持协同编辑框架的插件。
+//
 //   config::- An optional set of options
+//
+//   @cn 可选参数对象。
 //
 //     version:: ?number
 //     The starting version number of the collaborative editing.
 //     Defaults to 0.
 //
+//     @cn 协同编辑的起始版本号，默认是 0.
+//
 //     clientID:: ?union<number, string>
 //     This client's ID, used to distinguish its changes from those of
 //     other clients. Defaults to a random 32-bit number.
+//
+//     @cn 客户端 ID，用来分别哪些修改是自己做的哪些是其他客户端做的。默认是一个随机的 32 位数字。
 export function collab(config = {}) {
   config = {version: config.version || 0,
             clientID: config.clientID == null ? Math.floor(Math.random() * 0xFFFFFFFF) : config.clientID}
@@ -103,7 +111,13 @@ export function collab(config = {}) {
 // the authority. Applying this transaction moves the state forward to
 // adjust to the authority's view of the document.
 //
+// @cn 创建一个接受自鉴权中心的表示新 steps 集合的 transaction。应用该 transaction 以将 state 向前移动来适应文档的鉴权中心的视图。
+//
+// @comment 「鉴权中心」指的就是协同处理的服务端，那里负责处理接受那些 tr，拒绝哪些 tr。
+//
 //   options::- Additional options.
+//
+//   @cn 可选的配置参数。
 //
 //     mapSelectionBackward:: ?boolean
 //     When enabled (the default is `false`), if the current selection
@@ -112,6 +126,10 @@ export function collab(config = {}) {
 //     content inserted at the cursor ends up after the cursor. Users
 //     usually prefer this, but it isn't done by default for reasons
 //     of backwards compatibility.
+//
+//     @cn 启用后（默认是 `false`），如果当前选区是一个 [文本选区](#state.TextSelection)，则它的两侧位置会被这个
+//     transaction 通过一个负向偏移 mapped，以便使插入光标处的内容会以光标所在的位置结尾。用户通常倾向于这样做，不过因为向后兼容的
+//     原因，默认情况下不会这么做。
 export function receiveTransaction(state, steps, clientIDs, options) {
   // Pushes a set of steps (received from the central authority) into
   // the editor state (which should have the collab plugin enabled).
@@ -155,11 +173,16 @@ export function receiveTransaction(state, steps, clientIDs, options) {
 // to be sent to the central authority. Returns null when there is
 // nothing to send.
 //
+// @cn 提供编辑器未被确认的 steps 的数据描述，它会被发送给鉴权中心。如果没有需要发送的东西，返回 null。
+//
 // `origins` holds the _original_ transactions that produced each
 // steps. This can be useful for looking up time stamps and other
 // metadata for the steps, but note that the steps may have been
 // rebased, whereas the origin transactions are still the old,
 // unchanged objects.
+//
+// @cn `origins` 值是产生每个 steps 的 _原始_ transactions。对于寻找 steps 的时间戳和其他 metadata 信息很有用，不过记住，steps 可能会被 rebased，
+// 因此原始的 transaction 仍然是旧的，未改变的对象。
 export function sendableSteps(state) {
   let collabState = collabKey.getState(state)
   if (collabState.unconfirmed.length == 0) return null
@@ -174,6 +197,8 @@ export function sendableSteps(state) {
 // :: (EditorState) → number
 // Get the version up to which the collab plugin has synced with the
 // central authority.
+//
+// @cn 获取 collab 插件与鉴权中心同步的版本。
 export function getVersion(state) {
   return collabKey.getState(state).version
 }
